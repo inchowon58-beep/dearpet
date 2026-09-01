@@ -32,7 +32,7 @@ export const SITE = {
   domain: "deatpet.breederclub.co.kr",
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://deatpet.breederclub.co.kr",
   infocsUrl: "https://www.infocs.co.kr/",
-  naverSiteVerification: "cece4bd4b46fc8b1cec51cc220dfc8b51d01b88e",
+  naverSiteVerification: "4a03fc1b40c992c4421073ac20cdf757519ab007",
   themeColor: "#0e0c0a",
 } as const;
 
