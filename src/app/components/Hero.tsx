@@ -1,55 +1,54 @@
 "use client";
 
-import { Camera, MessageCircle } from "lucide-react";
-import { SITE, CTA_KAKAO, KEYWORD_INQUIRY } from "@/lib/site";
-import ImageSlot from "./ImageSlot";
+import Link from "next/link";
+import { MessageCircle } from "lucide-react";
+import { SITE, CTA_KAKAO } from "@/lib/site";
+import { breedPath } from "@/lib/breed-paths";
 import { useKakaoHref } from "./KakaoHrefProvider";
+
+const HERO_SHOTS = [
+  { slug: "포메라니안", name: "포메라니안", src: "https://image.cattery.co.kr/pome/01.webp" },
+  { slug: "랙돌", name: "랙돌", src: "https://image.cattery.co.kr/ragdoll/01.webp" },
+  { slug: "골든리트리버", name: "골든리트리버", src: "https://image.cattery.co.kr/coldenret/01.webp" },
+] as const;
 
 export default function Hero() {
   const kakaoHref = useKakaoHref();
   return (
-    <section id="top" className="relative min-h-[92svh] overflow-hidden">
-      <div className="absolute inset-0 hero-media">
-        <ImageSlot index={18} fill priority label={`${SITE.name} 메인쿤분양`} />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(36,48,86,0.5)_0%,rgba(36,48,86,0.08)_40%,rgba(18,22,36,0.92)_100%)]" />
-      </div>
-
-      <div className="container relative flex min-h-[92svh] flex-col justify-end pb-28 pt-28 md:pb-24">
-        <div className="animate-rise max-w-2xl">
-          <p className="text-xs font-semibold tracking-[0.22em] text-[#f4ead0]">
-            {SITE.taglineEn}
-          </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-[3.2rem]">
-            {SITE.name}
-            <span className="mt-4 block text-[0.42em] font-medium leading-snug tracking-normal text-white/90">
-              진열된 얼굴의 크기 · 기질 · 분양가
-            </span>
-          </h1>
-          <p className="mt-6 max-w-xl text-sm leading-relaxed text-white/85 md:text-base">
-            {SITE.tagline} 갤러리에서 얼굴을 고르신 뒤,{" "}
-            {kakaoHref ? "카카오톡으로 이어 주세요." : "맞을 것 같으면 상담으로 이어 주세요."}
-          </p>
-          <p className="mt-4 max-w-xl text-xs leading-relaxed text-[#f4ead0] md:text-sm">
-            {KEYWORD_INQUIRY}
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#gallery" className="btn-primary">
-              <Camera size={18} />
-              진열 사진 보기
+    <section id="top" className="home-hero container">
+      <div className="home-hero-copy">
+        <p className="home-kicker">{SITE.brandEn}</p>
+        <h1 className="home-title">{SITE.brand}</h1>
+        <p className="home-lead">
+          견종과 묘종을 사진으로 고르고, 자세한 성격·크기·키우기는 각 품종 페이지에서
+          확인하세요.
+        </p>
+        <p className="home-note">{SITE.tagline}</p>
+        <div className="home-actions">
+          <a href="#breeds" className="home-btn home-btn-gold">
+            품종 둘러보기
+          </a>
+          {kakaoHref ? (
+            <a
+              href={kakaoHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="home-btn home-btn-ghost"
+            >
+              <MessageCircle size={16} />
+              {CTA_KAKAO}
             </a>
-            {kakaoHref ? (
-              <a
-                href={kakaoHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-secondary"
-              >
-                <MessageCircle size={18} />
-                {CTA_KAKAO}
-              </a>
-            ) : null}
-          </div>
+          ) : null}
         </div>
+      </div>
+      <div className="home-hero-gallery">
+        {HERO_SHOTS.map((shot) => (
+          <Link key={shot.slug} href={breedPath(shot.slug)} className="home-hero-shot">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={shot.src} alt={`${shot.name} 분양`} />
+            <span>{shot.name}</span>
+          </Link>
+        ))}
       </div>
     </section>
   );

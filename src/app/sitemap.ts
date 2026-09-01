@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { listPageSummaries } from "@/lib/seo-pages";
 import { publicOrigin } from "@/lib/public-url";
+import { BREEDS, SPECIES_BREEDS } from "@/lib/breeds";
+import { breedPath } from "@/lib/breed-paths";
+import { KOREA_REGIONS, POPULAR_REGION_KEYS, SIDOS, getSigunguByKey } from "@/lib/korea-regions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -23,6 +26,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    {
+      url: `${base}/bunyang`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
   ];
 
   const guides = pages.map((p) => ({
@@ -32,5 +41,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...guides];
+  const breedHubs: MetadataRoute.Sitemap = BREEDS.map((b) => ({
+    url: `${base}${breedPath(b.slug)}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
+  const sidoPages: MetadataRoute.Sitemap = [];
+  for (const breed of BREEDS) {
+    for (const sido of SIDOS) {
+      sidoPages.push({
+        url: `${base}${breedPath(breed.slug, sido)}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.72,
+      });
+    }
+  }
+
+  const sigunguPages: MetadataRoute.Sitemap = [];
+  for (const breed of BREEDS) {
+    for (const region of KOREA_REGIONS) {
+      sigunguPages.push({
+        url: `${base}${breedPath(breed.slug, region.sido, region.sigungu)}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.65,
+      });
+    }
+  }
+
+  const dongPages: MetadataRoute.Sitemap = [];
+  for (const breed of SPECIES_BREEDS) {
+    for (const key of POPULAR_REGION_KEYS) {
+      const region = getSigunguByKey(key);
+      if (!region) continue;
+      for (const dong of region.dongs.slice(0, 3)) {
+        dongPages.push({
+          url: `${base}${breedPath(breed.slug, region.sido, region.sigungu, dong)}`,
+          lastModified: now,
+          changeFrequency: "weekly",
+          priority: 0.6,
+        });
+      }
+    }
+  }
+
+  return [...staticRoutes, ...guides, ...breedHubs, ...sidoPages, ...sigunguPages, ...dongPages];
 }

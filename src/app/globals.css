@@ -381,7 +381,22 @@ select {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-input:focus,
+input[type="checkbox"],
+input[type="radio"] {
+  appearance: auto;
+  width: 1rem;
+  min-width: 1rem;
+  max-width: 1rem;
+  height: 1rem;
+  padding: 0;
+  margin: 0;
+  border-radius: 0.25rem;
+  box-shadow: none;
+  accent-color: var(--coral);
+  flex-shrink: 0;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
 textarea:focus,
 select:focus {
   border-color: var(--coral);

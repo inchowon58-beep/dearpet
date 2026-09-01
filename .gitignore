@@ -22,4 +22,8 @@ tools/webdoc/*.exe
 public/order-data/orders/
 public/seo-data/pages/
 data/sponsor-login.json
+data/inquiries.json
 .vercel
+tools/webdoc-scheduler/dist/
+tools/webdoc-scheduler/build/
+tools/webdoc-scheduler/**/__pycache__/

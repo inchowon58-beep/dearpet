@@ -206,6 +206,12 @@ export default function SponsorAdminClient() {
           >
             입점 샘플 미리보기
           </Link>
+          <Link
+            href="/admin/inquiries"
+            className="rounded-full border border-[var(--line)] px-4 py-2 text-sm font-semibold"
+          >
+            분양문의
+          </Link>
           <Link href="/admin" className="rounded-full border border-[var(--line)] px-4 py-2 text-sm font-semibold">
             웹문서 관리
           </Link>

@@ -42,7 +42,7 @@ export default function AdminClient() {
   const isSponsor = role === "sponsor";
 
   function absolutePageUrl(path: string) {
-    const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://maincoon.marketstore.co.kr").replace(
+    const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://deatpet.breederclub.co.kr").replace(
       /\/$/,
       ""
     );
@@ -294,13 +294,21 @@ export default function AdminClient() {
               입점 샘플
             </span>
           ) : (
-            <Link
-              href="/sample"
-              target="_blank"
-              className="btn-secondary !text-[var(--navy)] !border-[var(--line)]"
-            >
-              입점 샘플
-            </Link>
+            <>
+              <Link
+                href="/sample"
+                target="_blank"
+                className="btn-secondary !text-[var(--navy)] !border-[var(--line)]"
+              >
+                입점 샘플
+              </Link>
+              <Link
+                href="/admin/inquiries"
+                className="btn-secondary !text-[var(--navy)] !border-[var(--line)]"
+              >
+                분양문의
+              </Link>
+            </>
           )}
           {isSponsor ? (
             <span className="btn-secondary pointer-events-none cursor-not-allowed opacity-40 !text-[var(--navy)] !border-[var(--line)]">
