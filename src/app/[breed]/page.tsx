@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BREEDS, getBreed, isBreedSlug } from "@/lib/breeds";
 import { buildBreedContent } from "@/lib/breed-content";
-import { BREED_REVALIDATE, breedJsonLd, breedMetadata } from "@/lib/breed-meta";
+import { breedJsonLd, breedMetadata } from "@/lib/breed-meta";
 import { publicOrigin } from "@/lib/public-url";
 import { breedPath } from "@/lib/breed-paths";
 import BreedLanding from "@/app/components/BreedLanding";
 
 type Props = { params: Promise<{ breed: string }> };
 
-export const revalidate = BREED_REVALIDATE;
+export const revalidate = 86400;
 export const dynamicParams = true;
 
 export function generateStaticParams() {
