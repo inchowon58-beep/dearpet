@@ -634,6 +634,56 @@
   color: var(--bl-muted);
 }
 
+.bl-fold {
+  margin-top: 1rem;
+  background: var(--bl-card);
+  border: 1px solid var(--bl-line);
+  border-radius: var(--bl-radius);
+}
+
+.bl-fold > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  cursor: pointer;
+  list-style: none;
+  padding: 0.95rem 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.bl-fold > summary em {
+  flex-shrink: 0;
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--bl-muted);
+}
+
+.bl-fold[open] > summary {
+  border-bottom: 1px solid var(--bl-line);
+}
+
+.bl-fold .bl-table-wrap {
+  margin-top: 0;
+  border: 0;
+  border-radius: 0 0 var(--bl-radius) var(--bl-radius);
+}
+
+.bl-fold-body {
+  padding: 0.85rem 1.1rem 1.2rem;
+}
+
+.bl-fold-body .bl-stats {
+  margin-top: 0;
+}
+
+.bl-fold-body .bl-lead {
+  margin-top: 0.85rem;
+  font-size: 0.95rem;
+}
+
 .bl-root details > summary::-webkit-details-marker {
   display: none;
 }
@@ -691,6 +741,50 @@
 
 .bl-hero-simple {
   padding: 1.6rem 0 2.4rem;
+}
+
+.bl-gallery {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.bl-gallery-item {
+  margin: 0;
+}
+
+.bl-gallery-photo {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: calc(var(--bl-radius) * 0.55);
+  background: var(--bl-soft);
+}
+
+.bl-gallery figcaption {
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--bl-ink);
+}
+
+@media (max-width: 639px) {
+  .bl-gallery {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding-bottom: 0.2rem;
+    scroll-snap-type: x mandatory;
+  }
+
+  .bl-gallery-item {
+    flex: 0 0 38%;
+    scroll-snap-align: start;
+  }
 }
 
 .bl-hero-photo-wide {
@@ -904,6 +998,133 @@
 
 .bl-closer .bl-h2 {
   max-width: 40rem;
+}
+
+.bl-stats {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.1rem;
+}
+
+.bl-stats-hero {
+  margin-top: 1.1rem;
+}
+
+.bl-stats-hero .bl-stat strong {
+  font-size: 1.45rem;
+}
+
+.bl-source-inline {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (min-width: 768px) {
+  .bl-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.bl-stat {
+  padding: 0.95rem 1rem 1.05rem;
+  background: var(--bl-card);
+  border: 1px solid var(--bl-line);
+  border-radius: var(--bl-radius);
+}
+
+.bl-stat span {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--bl-accent);
+}
+
+.bl-stat strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
+}
+
+.bl-stat em {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-style: normal;
+  line-height: 1.45;
+  color: var(--bl-muted);
+}
+
+.bl-profile-cards strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.bl-table-wrap {
+  margin-top: 1.35rem;
+  overflow-x: auto;
+  background: var(--bl-card);
+  border: 1px solid var(--bl-line);
+  border-radius: var(--bl-radius);
+}
+
+.bl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.bl-table caption {
+  caption-side: top;
+  padding: 0.9rem 1rem 0.55rem;
+  text-align: left;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.bl-table th,
+.bl-table td {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.bl-table thead th {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--bl-muted);
+  border-bottom: 1px solid var(--bl-line);
+}
+
+.bl-table tbody th {
+  width: 28%;
+  font-weight: 700;
+  color: var(--bl-ink);
+}
+
+.bl-table tbody tr + tr th,
+.bl-table tbody tr + tr td {
+  border-top: 1px solid var(--bl-line);
+}
+
+.bl-table td {
+  color: var(--bl-muted);
+}
+
+.bl-table a {
+  font-weight: 700;
+  color: var(--bl-accent);
+}
+
+.bl-source {
+  margin: 0;
+  padding: 0.65rem 1rem 0.9rem;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: var(--bl-muted);
 }
 
 .bl-chip,

@@ -4,7 +4,7 @@ import type { Breed } from "@/lib/breeds";
 import { CAT_BREEDS, DOG_BREEDS } from "@/lib/breeds";
 import type { BreedLandingContent } from "@/lib/breed-content";
 import { placeLabel } from "@/lib/breed-content";
-import { breedPhotos } from "@/lib/breed-images";
+import { breedGalleryCards, breedPhotos } from "@/lib/breed-images";
 import { breedPath, bunyangPath } from "@/lib/breed-paths";
 import type { KoreaSigungu } from "@/lib/korea-regions";
 import {
@@ -32,7 +32,9 @@ export default function BreedLanding({
   dong?: string;
   pagePath: string;
 }) {
-  const photos = breedPhotos(breed, [sido, sigungu, dong].filter(Boolean).join("_"));
+  const salt = [sido, sigungu, dong].filter(Boolean).join("_");
+  const photos = breedPhotos(breed, salt);
+  const gallery = breedGalleryCards(breed, salt, 5);
   const place = placeLabel(sido, sigungu, dong);
   const nearbyGu = sido && sigungu ? neighborSigungus(sido, sigungu, 8) : [];
   const nearbyDong = sido && sigungu && dong ? neighborDongs(sido, sigungu, dong, 8) : [];
@@ -94,9 +96,27 @@ export default function BreedLanding({
         <div className="bl-hero-photo bl-hero-photo-wide">
           <BreedPhoto src={photos.hero} alt={`${content.h1} 대표 사진`} priority sizes="100vw" />
         </div>
+        <section className="bl-gallery" aria-label={`${breed.name} 분양 사진`}>
+          {gallery.map((card) => (
+            <figure key={card.id} id={card.id} className="bl-gallery-item">
+              <div className="bl-gallery-photo">
+                <BreedPhoto src={card.src} alt={card.name} sizes="20vw" />
+              </div>
+              <figcaption>{card.name}</figcaption>
+            </figure>
+          ))}
+        </section>
         <div className="bl-prose bl-intro">
           {content.intro.map((p) => (
             <p key={p.slice(0, 28)}>{p}</p>
+          ))}
+        </div>
+        <div className="bl-stats bl-profile-cards" aria-label={`${breed.name} 품종 요약`}>
+          {content.profile.cards.map((c) => (
+            <article key={c.label} className="bl-stat">
+              <span>{c.label}</span>
+              <strong>{c.value}</strong>
+            </article>
           ))}
         </div>
       </header>
@@ -169,15 +189,66 @@ export default function BreedLanding({
         </div>
       </section>
 
-      {photos.grid.length ? (
-        <section className="bl-wrap bl-photos" aria-label="사진">
-          {photos.grid.map((src, i) => (
-            <div key={src} className="bl-photos-cell">
-              <BreedPhoto src={src} alt={`${place} ${breed.name} ${i + 1}`} sizes="25vw" />
-            </div>
+      <section className="bl-wrap bl-block">
+        <p className="bl-kicker">BREED</p>
+        <h2 className="bl-h2">{content.profile.h2}</h2>
+        <p className="bl-lead">
+          {content.profile.origin}. {content.profile.beginner}
+        </p>
+        <div className="bl-prose">
+          {content.profile.paragraphs.map((p) => (
+            <p key={p.slice(0, 24)}>{p}</p>
           ))}
-        </section>
-      ) : null}
+        </div>
+        <details className="bl-fold">
+          <summary>
+            <span>{breed.name} 건강·유전에서 자주 보는 항목</span>
+            <em>{content.profile.genetics.length}항목</em>
+          </summary>
+          <div className="bl-table-wrap">
+            <table className="bl-table">
+              <thead>
+                <tr>
+                  <th>항목</th>
+                  <th>안내</th>
+                </tr>
+              </thead>
+              <tbody>
+                {content.profile.genetics.map((g) => (
+                  <tr key={g.name}>
+                    <th scope="row">{g.name}</th>
+                    <td>{g.detail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <details className="bl-fold">
+          <summary>
+            <span>{breed.name} 일상 관리</span>
+            <em>{content.profile.care.length}항목</em>
+          </summary>
+          <div className="bl-table-wrap">
+            <table className="bl-table">
+              <thead>
+                <tr>
+                  <th>항목</th>
+                  <th>안내</th>
+                </tr>
+              </thead>
+              <tbody>
+                {content.profile.care.map((g) => (
+                  <tr key={g.name}>
+                    <th scope="row">{g.name}</th>
+                    <td>{g.detail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
 
       <section className="bl-wrap bl-block">
         <p className="bl-kicker">FAQ</p>
@@ -195,10 +266,66 @@ export default function BreedLanding({
       <section className="bl-wrap bl-block">
         <p className="bl-kicker">LOCAL</p>
         <h2 className="bl-h2">{content.local.h2}</h2>
-        {content.local.paragraphs.map((p) => (
+        {content.local.paragraphs.slice(1).map((p) => (
           <p key={p.slice(0, 22)} className="bl-lead">
             {p}
           </p>
+        ))}
+
+        <details className="bl-fold">
+          <summary>
+            <span>{content.localFacts.snapshotH2}</span>
+            <em>판매·생산·병원</em>
+          </summary>
+          <div className="bl-fold-body">
+            <div className="bl-stats">
+              {content.localFacts.stats.map((s) => (
+                <article key={s.label} className="bl-stat">
+                  <span>{s.label}</span>
+                  <strong>{s.value}</strong>
+                  <em>{s.note}</em>
+                </article>
+              ))}
+            </div>
+            <p className="bl-lead">{content.localFacts.paragraphs[0]}</p>
+            <p className="bl-source bl-source-inline">{content.localFacts.snapshotSource}</p>
+          </div>
+        </details>
+
+        {content.localFacts.tables.map((table) => (
+          <details key={table.caption} className="bl-fold">
+            <summary>
+              <span>{table.caption}</span>
+              <em>{table.rows.length}건</em>
+            </summary>
+            <div className="bl-table-wrap">
+              <table className="bl-table">
+                <thead>
+                  <tr>
+                    {table.headers.map((h) => (
+                      <th key={h}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.rows.map((row) => (
+                    <tr key={row.cells.join("-")}>
+                      {row.cells.map((cell, i) => (
+                        <td key={`${cell}-${i}`}>
+                          {i === 0 && row.href ? (
+                            <Link href={row.href}>{cell}</Link>
+                          ) : (
+                            cell
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="bl-source">{table.source}</p>
+            </div>
+          </details>
         ))}
 
         {sidoList.length ? (

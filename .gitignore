@@ -26,4 +26,5 @@ data/inquiries.json
 .vercel
 tools/webdoc-scheduler/dist/
 tools/webdoc-scheduler/build/
+tools/.encyclopedia-rewrite-done.json
 tools/webdoc-scheduler/**/__pycache__/

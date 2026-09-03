@@ -677,6 +677,16 @@ export function kindKo(breed: Breed): string {
   return "견종";
 }
 
+/** 대형 → 대형견, 중형 → 중형묘처럼 체구 말에 견/묘를 붙입니다. */
+export function sizeClass(breed: Breed): string {
+  const s = (breed.size || "").trim();
+  if (!s || s === "다양") return s || "다양";
+  if (/(견|묘)$/.test(s)) return s;
+  if (breed.kind === "cat") return `${s}묘`;
+  if (breed.kind === "dog") return `${s}견`;
+  return s;
+}
+
 export function relatedBreeds(breed: Breed, count = 6): Breed[] {
   const same = SPECIES_BREEDS.filter((b) => b.kind === breed.kind && b.slug !== breed.slug);
   const rest = SPECIES_BREEDS.filter((b) => b.kind !== breed.kind);

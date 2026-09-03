@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { Breed } from "./breeds";
 import { kindKo } from "./breeds";
-import { breedOgImages } from "./breed-images";
+import { breedGalleryCards } from "./breed-images";
 import { buildBreedContent, placeLabel } from "./breed-content";
 import { breedPath } from "./breed-paths";
 import { SITE } from "./site";
@@ -18,13 +18,14 @@ export function breedMetadata(
   const content = buildBreedContent(breed, sido, sigungu, dong);
   const place = placeLabel(sido, sigungu, dong);
   const salt = [sido, sigungu, dong].filter(Boolean).join("_");
-  const images = breedOgImages(breed, salt, 6);
+  const gallery = breedGalleryCards(breed, salt, 5);
+  const images = gallery.map((c) => c.src);
   const url = origin + breedPath(breed.slug, sido, sigungu, dong);
-  const ogImages = images.map((url) => ({
-    url,
+  const ogImages = gallery.map((card) => ({
+    url: card.src,
     width: 800,
-    height: 600,
-    alt: `${place} ${breed.name} 분양`,
+    height: 800,
+    alt: card.name,
   }));
 
   return {
@@ -64,8 +65,10 @@ export function breedJsonLd(
 ) {
   const content = buildBreedContent(breed, sido, sigungu, dong);
   const place = placeLabel(sido, sigungu, dong);
+  const salt = [sido, sigungu, dong].filter(Boolean).join("_");
   const url = origin + breedPath(breed.slug, sido, sigungu, dong);
-  const images = breedOgImages(breed, [sido, sigungu, dong].filter(Boolean).join("_"), 6);
+  const gallery = breedGalleryCards(breed, salt, 5);
+  const images = gallery.map((c) => c.src);
 
   const crumbs = [
     { "@type": "ListItem", position: 1, name: "홈", item: origin },
@@ -102,6 +105,26 @@ export function breedJsonLd(
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: crumbs,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `${place} ${breed.name} 분양 사진`,
+      numberOfItems: gallery.length,
+      itemListElement: gallery.map((card, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: card.name,
+        url: `${url}#${card.id}`,
+        image: card.src,
+        item: {
+          "@type": "ImageObject",
+          contentUrl: card.src,
+          url: `${url}#${card.id}`,
+          name: card.name,
+          caption: card.name,
+        },
+      })),
     },
     {
       "@context": "https://schema.org",

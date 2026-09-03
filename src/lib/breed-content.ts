@@ -1,8 +1,10 @@
 import type { Breed } from "./breeds";
-import { kindKo, relatedBreeds } from "./breeds";
+import { kindKo, relatedBreeds, sizeClass } from "./breeds";
 import { getEncyclopedia } from "./breed-encyclopedia";
-import { eulReul, eunNeun, euroRo, iGa } from "./korean";
+import type { GuideFact } from "./breed-encyclopedia";
+import { eulReul, eunNeun, euroRo, iGa, iraRa } from "./korean";
 import { areaLabel } from "./korea-regions";
+import { buildLocalRegionFacts, type LocalRegionFacts } from "./local-region-facts";
 import { SITE } from "./site";
 
 export type BreedFaq = { q: string; a: string };
@@ -19,6 +21,8 @@ export type StepBlock = {
 export type ObserveCard = { title: string; lead: string; items: string[] };
 export type CareItem = { n: string; title: string; body: string };
 
+export type BreedProfileFact = { label: string; value: string };
+
 export type BreedLandingContent = {
   kicker: string;
   h1: string;
@@ -28,6 +32,16 @@ export type BreedLandingContent = {
   keywords: string[];
   lead: string;
   intro: string[];
+  profile: {
+    h2: string;
+    cards: BreedProfileFact[];
+    origin: string;
+    paragraphs: string[];
+    genetics: GuideFact[];
+    care: GuideFact[];
+    beginner: string;
+  };
+  localFacts: LocalRegionFacts;
   steps: StepBlock[];
   observe: { h2: string; lead: string; cards: ObserveCard[] };
   care: { kicker: string; h2: string; lead: string; items: CareItem[]; closer: string };
@@ -89,6 +103,7 @@ export function buildBreedContent(
   const name = breed.name;
   const seed = hash(`${breed.slug}|${admin}|${place}`);
   const enc = getEncyclopedia(breed);
+  const localFacts = buildLocalRegionFacts(breed, sido, sigungu, dong);
   const related = relatedBreeds(breed, 4)
     .map((b) => b.name)
     .join("·");
@@ -96,6 +111,9 @@ export function buildBreedContent(
   const isShelter = breed.kind === "shelter";
   const pet = isCat ? "고양이" : isShelter ? breed.noun : "강아지";
   const baby = isCat ? "아기 고양이" : isShelter ? "아이" : "아기 강아지";
+  const size = sizeClass(breed);
+  const salesStat = localFacts.stats.find((s) => s.label === "분양 등록업체")?.value || "";
+  const hospitalStat = localFacts.stats.find((s) => s.label === "병원 수")?.value || "";
 
   const kicker = `${place} · ${name} 분양 가이드`;
 
@@ -110,16 +128,17 @@ export function buildBreedContent(
     seed
   );
 
-  const title = `${place} ${name} 분양 - 건강한 전문 분양 안내`;
-  const localH2 = `${place} 행정구역별 분양 안내`;
-  const description = pick(
-    [
-      `${place} ${name}분양 전 기준·집 준비·대면 관찰·인계 순서를 정리했습니다. ${admin}에서 ${kw} 건강 기록과 이후 관리까지 ${SITE.brand}이 안내합니다.`,
-      `${admin} ${kw} 가이드. ${name}의 ${breed.size}·${breed.coat}를 집 구조에 맞춰 보고, 컨디션 확인 후 인계하는 절차를 담았습니다.`,
-      `${place} 지역 ${name} 분양 안내. 분양가만 보지 않고 예방·구충·사료·화장실 습관까지 확인하는 ${SITE.brand} 가이드입니다.`,
-    ],
-    seed + 3
-  ).replace("{site}", SITE.brand);
+  const title = `${place} ${name} 분양 - ${admin} 안내`;
+  const localH2 = `${place} 지역 ${name} 분양, 이 동네는 어떤 곳인가`;
+  const description = (
+    dong
+      ? `${dong}(${sido} ${sigungu}) ${name} 분양. 병원 ${hospitalStat}, 판매업 ${salesStat}. ${SITE.brand} 안내.`
+      : sigungu
+        ? `${sido} ${sigungu} ${name} 분양. 병원 ${hospitalStat}, 판매업 ${salesStat}. ${SITE.brand} 가이드.`
+        : sido
+          ? `${sido} ${name} 분양. 병원 ${hospitalStat}, 판매업 ${salesStat}. ${SITE.brand}이 정리했습니다.`
+          : `전국 ${name} 분양. 병원 ${hospitalStat}, 판매업 ${salesStat}. ${SITE.brand} 안내.`
+  ).slice(0, 158);
 
   const lead = pick(
     [
@@ -143,7 +162,7 @@ export function buildBreedContent(
       [
         `특히 어린 ${pet}${eunNeun(pet)} 환경 변화에 민감합니다. ${place} 새 집에서 식사량이 줄거나 숨어 지내는 모습은 흔하고, 처음 적응 공간이 이후 습관에 영향을 줍니다.`,
         `${name}${eunNeun(name)} ${breed.temperament} ${place} 생활 패턴—집을 비우는 시간, 가족 구성, 다른 반려동물—과 맞는지가 외모보다 중요합니다.`,
-        `${breed.size} 체구와 ${breed.coat} 특성상 ${place} 집의 동선·환기·관리 시간이 빠지면 예쁜 사진과 실제 하루가 어긋나기 쉽습니다.`,
+        `${size} 체구와 ${breed.coat} 특성상 ${place} 집의 동선·환기·관리 시간이 빠지면 예쁜 사진과 실제 하루가 어긋나기 쉽습니다.`,
       ],
       seed + 4
     ),
@@ -194,7 +213,7 @@ export function buildBreedContent(
         pick(
           [
             `${place} ${kw}를 볼 때 가장 먼저 눈에 들어오는 것은 외모입니다. 귀여운 모습에 마음이 움직이는 것은 자연스럽지만, 실제 반려생활에서는 외모보다 중요한 부분이 많습니다.`,
-            `${name}${eunNeun(name)} ${breed.tag}입니다. ${place}에서 고를 때 얼굴 다음으로 ${breed.coat} 관리량과 ${breed.size} 성체 크기를 집 동선에 대입해 보세요.`,
+            `${name}${eunNeun(name)} ${breed.tag}입니다. ${place}에서 고를 때 얼굴 다음으로 ${breed.coat} 관리량과 ${size} 성체 크기를 집 동선에 대입해 보세요.`,
           ],
           seed + 6
         ),
@@ -218,7 +237,7 @@ export function buildBreedContent(
           `화장실과 잠자리 위치를 처음 삼 일 동안 옮기지 않는 것이 ${name} 적응에 유리합니다. 보호소에서 먹던 사료를 받아 천천히 바꾸는 편이 안전합니다.`,
         ]
       : [
-          `${place} ${kw} 전에는 산책 동선, 잠자리, 식기, 배변 패드를 미리 정해 두는 것이 좋습니다. ${name}${eunNeun(name)} ${breed.size}라 미끄러운 바닥과 높은 점프를 줄여 주세요.`,
+          `${place} ${kw} 전에는 산책 동선, 잠자리, 식기, 배변 패드를 미리 정해 두는 것이 좋습니다. ${name}${eunNeun(name)} ${size}${iraRa(size)} 미끄러운 바닥과 높은 점프를 줄여 주세요.`,
           `${breed.homeNeed} ${place} 엘리베이터·복도 소음에도 처음에는 긴장을 잘합니다. 첫 산책은 짧게, 같은 길로 반복하는 편이 안정적입니다.`,
         ];
 
@@ -311,7 +330,7 @@ export function buildBreedContent(
         },
         {
           title: "보행",
-          lead: `${breed.size} 체구는 슬개골·허리 부담이 바로 보일 수 있습니다.`,
+          lead: `${size} 체구는 슬개골·허리 부담이 바로 보일 수 있습니다.`,
           items: shuffle(
             ["절뚝임", "앉을 때 한쪽 다리를 빼는 모습", "계단을 거부하는 모습", "과도한 점프 유도는 피할 것"],
             seed + 13
@@ -408,16 +427,22 @@ export function buildBreedContent(
       a: enc.care.find((c) => /털|빗|미용/.test(c.name))?.detail || `${breed.coat}. ${place} 생활 시간과 맞춰 주기를 상담에서 잡아 드립니다.`,
     },
   ];
-  const faqs = shuffle(faqsPool, seed + 20).slice(0, 4);
+  const localFaqs: BreedFaq[] = localFacts.paragraphs.slice(1, 3).map((p, i) =>
+    i === 0
+      ? {
+          q: `${place}${eunNeun(place)} 어디에 속하고, ${name} 안내는 어디까지인가요?`,
+          a: p,
+        }
+      : {
+          q: `${place}에서 ${name}${eulReul(name)} 고를 때 무엇을 먼저 보면 되나요?`,
+          a: `${p} 비슷한 ${kindKo(breed)}은 ${related} 페이지도 함께 보시면 됩니다.`,
+        }
+  );
+  const faqs = [...localFaqs, ...shuffle(faqsPool, seed + 20).slice(0, 4)];
 
   const localParas = [
-    `${place} ${name} 분양은 시·군·구·동 단위로 안내합니다. 이웃 동네와 비슷한 ${kindKo(breed)}(${related}) 페이지를 함께 보시면 이동 범위가 분명해집니다.`,
-    dong
-      ? `${dong}${eunNeun(dong)} ${sido} ${sigungu}에 속합니다. 같은 구의 다른 동과 인근 시·군·구 ${kw} 안내로 이어집니다.`
-      : sigungu
-        ? `${sigungu} ${kw}는 아래 동·읍·면으로 나뉩니다. ${sido}의 다른 시·군·구와도 연결됩니다.`
-        : `전국 ${name} 분양 허브입니다. 시·도를 고르시면 해당 지역 맞춤 안내로 이동합니다.`,
-    `${breed.size} · ${breed.tag} 특성을 ${admin} 주거 환경에 대입해 보신 뒤 문의를 남기시면 상담이 짧아집니다.`,
+    ...localFacts.paragraphs,
+    `이웃 동네와 비슷한 ${kindKo(breed)}(${related}) 페이지를 함께 보시면 ${admin} 이동 범위가 분명해집니다.`,
   ];
 
   const closerH2 = pick(
@@ -447,6 +472,21 @@ export function buildBreedContent(
     ],
     lead,
     intro,
+    profile: {
+      h2: `${name} 품종 요약`,
+      cards: [
+        { label: "체구", value: size },
+        { label: "털", value: breed.coat },
+        { label: "원산·계통", value: enc.origin },
+        { label: "집 환경", value: breed.homeNeed },
+      ],
+      origin: enc.origin,
+      paragraphs: enc.paragraphs,
+      genetics: enc.genetics,
+      care: enc.care,
+      beginner: enc.beginner,
+    },
+    localFacts,
     steps: [
       {
         n: "1",

@@ -93,6 +93,64 @@ export function pickBreedImages(breed: Breed, count: number, salt = ""): string[
   return Array.from({ length: count }, (_, i) => shuffled[i % shuffled.length]);
 }
 
+const PUP_NAMES = [
+  "밍키",
+  "나비",
+  "초코",
+  "보리",
+  "구름",
+  "달이",
+  "콩이",
+  "별이",
+  "모카",
+  "라떼",
+  "하루",
+  "토리",
+  "루시",
+  "코코",
+  "밤이",
+  "뭉치",
+  "하리",
+  "누리",
+  "다온",
+  "시루",
+  "마루",
+  "두부",
+  "밤비",
+  "솔이",
+  "단이",
+  "복이",
+  "초롱",
+  "별하",
+  "송이",
+  "가을",
+  "겨울",
+  "봄이",
+];
+
+export type BreedGalleryCard = {
+  id: string;
+  src: string;
+  name: string;
+};
+
+/** 지역 페이지 상단 5장 — 캡션·스키마·OG를 같은 세트로 맞춥니다. */
+export function breedGalleryCards(breed: Breed, salt = "", count = 5): BreedGalleryCard[] {
+  const rng = mulberry32(hashSlug(`${breed.slug}|${salt}|names`) ^ 0x51ed);
+  const names = [...PUP_NAMES];
+  for (let i = names.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [names[i], names[j]] = [names[j], names[i]];
+  }
+  const images = pickBreedImages(breed, count, `${salt}|gallery`);
+  const label = breed.keyword || `${breed.name}분양`;
+  return Array.from({ length: count }, (_, i) => ({
+    id: `card-${i + 1}`,
+    src: images[i] || breedCover(breed.folder),
+    name: `${label} ${names[i % names.length]}`,
+  }));
+}
+
 /** 네이버 OG용 — 대표 썸네일 여러 장 */
 export function breedOgImages(breed: Breed, salt = "", count = 6): string[] {
   const cover = breedCover(breed.folder);

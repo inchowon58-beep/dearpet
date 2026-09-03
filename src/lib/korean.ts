@@ -26,6 +26,10 @@ export function iGa(word: string): string {
   return hasBatchim(word) ? "이" : "가";
 }
 
+export function iraRa(word: string): string {
+  return hasBatchim(word) ? "이라" : "라";
+}
+
 export function euroRo(word: string): string {
   const code = lastHangulCode(word);
   if (code == null) return "로";
