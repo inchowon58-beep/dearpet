@@ -3,7 +3,7 @@ import { listPageSummaries } from "@/lib/seo-pages";
 import { publicOrigin } from "@/lib/public-url";
 import { BREEDS, SPECIES_BREEDS } from "@/lib/breeds";
 import { breedPath } from "@/lib/breed-paths";
-import { KOREA_REGIONS, POPULAR_REGION_KEYS, SIDOS, getSigunguByKey } from "@/lib/korea-regions";
+import { KOREA_REGIONS, POPULAR_REGION_KEYS, SIDOS, SIDO_SHORT_NAMES, getSigunguByKey } from "@/lib/korea-regions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -56,6 +56,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: now,
         changeFrequency: "weekly",
         priority: 0.72,
+      });
+    }
+    for (const sido of SIDO_SHORT_NAMES) {
+      sidoPages.push({
+        url: `${base}${breedPath(breed.slug, sido)}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.7,
       });
     }
   }

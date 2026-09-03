@@ -1,5 +1,5 @@
 import raw from "@/data/local-pet-biz.json";
-import { getDongs, getSigungus, regionKey, SIDOS } from "./korea-regions";
+import { canonicalSido, getDongs, getSigungus, regionKey, SIDOS } from "./korea-regions";
 
 type Triple = [name: string, dong: string, year?: string];
 type RegionRec = {
@@ -61,7 +61,8 @@ function splitItems(items: BizItem[], dong?: string) {
 }
 
 function recOf(sido: string, sigungu: string): RegionRec {
-  return REGIONS[regionKey(sido, sigungu)] || EMPTY;
+  const official = canonicalSido(sido) || sido;
+  return REGIONS[regionKey(official, sigungu)] || EMPTY;
 }
 
 function mergeRecs(recs: RegionRec[]): RegionRec {
@@ -78,7 +79,8 @@ function mergeRecs(recs: RegionRec[]): RegionRec {
 }
 
 function sidoRecs(sido: string): RegionRec[] {
-  const prefix = `${sido}_`;
+  const official = canonicalSido(sido) || sido;
+  const prefix = `${official}_`;
   return Object.entries(REGIONS)
     .filter(([k]) => k.startsWith(prefix))
     .map(([, v]) => v);
@@ -96,11 +98,13 @@ export function getBizBundle(sido?: string, sigungu?: string, dong?: string) {
   let rec: RegionRec = EMPTY;
   let dogKeys: string[] = [];
   if (sido && sigungu) {
-    rec = recOf(sido, sigungu);
-    dogKeys = [regionKey(sido, sigungu)];
+    const official = canonicalSido(sido) || sido;
+    rec = recOf(official, sigungu);
+    dogKeys = [regionKey(official, sigungu)];
   } else if (sido) {
-    rec = mergeRecs(sidoRecs(sido));
-    dogKeys = Object.keys(DOGS).filter((k) => k.startsWith(`${sido}_`));
+    const official = canonicalSido(sido) || sido;
+    rec = mergeRecs(sidoRecs(official));
+    dogKeys = Object.keys(DOGS).filter((k) => k.startsWith(`${official}_`));
   } else {
     rec = mergeRecs(Object.values(REGIONS));
     dogKeys = Object.keys(DOGS);

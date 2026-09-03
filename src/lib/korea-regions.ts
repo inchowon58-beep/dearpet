@@ -292,9 +292,62 @@ export const KOREA_REGIONS: KoreaSigungu[] = ROWS.map(([sido, sigungu, dongs]) =
 
 export const SIDOS = [...new Set(KOREA_REGIONS.map((r) => r.sido))];
 
-export function parseSidoName(raw: string): string | null {
+/** 서울특별시 → 서울 처럼 검색·URL용 짧은 이름 */
+export const SIDO_SHORT: Record<string, string> = {
+  서울특별시: "서울",
+  부산광역시: "부산",
+  대구광역시: "대구",
+  인천광역시: "인천",
+  광주광역시: "광주",
+  대전광역시: "대전",
+  울산광역시: "울산",
+  세종특별자치시: "세종",
+  경기도: "경기",
+  강원특별자치도: "강원",
+  충청북도: "충북",
+  충청남도: "충남",
+  전북특별자치도: "전북",
+  전라남도: "전남",
+  경상북도: "경북",
+  경상남도: "경남",
+  제주특별자치도: "제주",
+};
+
+const SIDO_ALIASES: Record<string, string> = {
+  ...Object.fromEntries(Object.entries(SIDO_SHORT).map(([full, short]) => [short, full])),
+  강원도: "강원특별자치도",
+  전라북도: "전북특별자치도",
+  전북도: "전북특별자치도",
+  제주도: "제주특별자치도",
+};
+
+export const SIDO_SHORT_NAMES = SIDOS.map((s) => SIDO_SHORT[s]).filter((s): s is string => Boolean(s));
+
+export function canonicalSido(raw: string): string | null {
   const name = decodeURIComponent(raw || "").trim();
-  return SIDOS.includes(name) ? name : null;
+  if (!name) return null;
+  if (SIDOS.includes(name)) return name;
+  return SIDO_ALIASES[name] || null;
+}
+
+export function shortSidoName(official: string): string | undefined {
+  return SIDO_SHORT[official];
+}
+
+/** 칩·사이트맵용: 서울특별시 다음에 서울 */
+export function sidoChipNames(excludeOfficial?: string): string[] {
+  const out: string[] = [];
+  for (const s of SIDOS) {
+    if (excludeOfficial && s === excludeOfficial) continue;
+    out.push(s);
+    const short = SIDO_SHORT[s];
+    if (short) out.push(short);
+  }
+  return out;
+}
+
+export function parseSidoName(raw: string): string | null {
+  return canonicalSido(raw);
 }
 
 export function isSidoName(raw: string): boolean {
@@ -310,7 +363,8 @@ for (const r of KOREA_REGIONS) {
 }
 
 export function getSigungu(sido: string, sigungu: string): KoreaSigungu | undefined {
-  return BY_KEY.get(regionKey(sido, sigungu));
+  const official = canonicalSido(sido) || sido;
+  return BY_KEY.get(regionKey(official, sigungu));
 }
 
 export function getSigunguByKey(key: string): KoreaSigungu | undefined {
@@ -320,7 +374,8 @@ export function getSigunguByKey(key: string): KoreaSigungu | undefined {
 }
 
 export function getSigungus(sido: string): KoreaSigungu[] {
-  return BY_SIDO.get(sido) || [];
+  const official = canonicalSido(sido) || sido;
+  return BY_SIDO.get(official) || [];
 }
 
 export function getDongs(sido: string, sigungu: string): string[] {

@@ -12,7 +12,7 @@ import {
   getSigungus,
   neighborDongs,
   neighborSigungus,
-  SIDOS,
+  sidoChipNames,
 } from "@/lib/korea-regions";
 import BreedPhoto from "./BreedPhoto";
 import BreedInquiryForm from "./BreedInquiryForm";
@@ -39,9 +39,9 @@ export default function BreedLanding({
   const nearbyGu = sido && sigungu ? neighborSigungus(sido, sigungu, 8) : [];
   const nearbyDong = sido && sigungu && dong ? neighborDongs(sido, sigungu, dong, 8) : [];
   const dongList = sido && sigungu && !dong ? getDongs(sido, sigungu) : [];
-  const sidoList = !sido ? SIDOS : [];
+  const sidoList = !sido ? sidoChipNames() : [];
   const sigunguList: KoreaSigungu[] = sido && !sigungu ? getSigungus(sido) : [];
-  const otherSidos = sido && !sigungu ? SIDOS.filter((s) => s !== sido) : [];
+  const otherSidos = sido && !sigungu ? sidoChipNames(sido) : [];
   const samePlace = (slug: string) => {
     if (sido && sigungu && dong) return breedPath(slug, sido, sigungu, dong);
     if (sido && sigungu) return breedPath(slug, sido, sigungu);

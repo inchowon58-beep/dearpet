@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { BREEDS, getBreed, isBreedSlug } from "@/lib/breeds";
 import { buildBreedContent } from "@/lib/breed-content";
 import { breedJsonLd, breedMetadata } from "@/lib/breed-meta";
-import { getSigunguByKey, parseSidoName, POPULAR_REGION_KEYS, SIDOS } from "@/lib/korea-regions";
+import { getSigunguByKey, parseSidoName, POPULAR_REGION_KEYS, SIDOS, SIDO_SHORT_NAMES } from "@/lib/korea-regions";
 import { publicOrigin } from "@/lib/public-url";
 import { breedPath } from "@/lib/breed-paths";
 import BreedLanding from "@/app/components/BreedLanding";
@@ -17,6 +17,9 @@ export function generateStaticParams() {
   const params: { breed: string; sidoSigungu: string }[] = [];
   for (const breed of BREEDS) {
     for (const sido of SIDOS) {
+      params.push({ breed: breed.slug, sidoSigungu: sido });
+    }
+    for (const sido of SIDO_SHORT_NAMES) {
       params.push({ breed: breed.slug, sidoSigungu: sido });
     }
     for (const key of POPULAR_REGION_KEYS) {
