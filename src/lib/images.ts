@@ -1,5 +1,8 @@
 import { SITE } from "./site";
 
+/** 루트 `/01.webp`는 없고, 견종 폴더 아래만 있습니다. */
+const DEFAULT_IMAGE_FOLDER = "maincoon";
+
 /** 히어로·소개·특징 카드 */
 export const FEATURE_FILES = [18, 9, 5, 14, 22, 33, 11, 36] as const;
 
@@ -17,7 +20,8 @@ function clampFile(num: number): number {
 export function fileUrl(fileNo: number): string {
   const n = clampFile(fileNo);
   if (!SITE.imageBase) return `placeholder:${n}`;
-  return `${SITE.imageBase}/${String(n).padStart(2, "0")}.webp`;
+  const base = SITE.imageBase.replace(/\/$/, "");
+  return `${base}/${DEFAULT_IMAGE_FOLDER}/${String(n).padStart(2, "0")}.webp`;
 }
 
 export function imageUrl(index: number): string {
